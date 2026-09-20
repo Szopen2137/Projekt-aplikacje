@@ -2,10 +2,7 @@
 projekt do szkoły tworzenie stron i aplikacji internetowych
 ## Tematyka strony: 
 * Salon fizjoterapii
-## Autorzy
 
-* **Alan Ossoliński** – [@rudyk0607](https://github.com/rudyk0607) 
-* **Szymon Trojanek** – [@Szopen2137](https://github.com/Szopen2137)
 
 
 
@@ -26,3 +23,9 @@ W bazie znajdują się wstępnie skonfigurowane konta testowe:
 * **Administrator:** admin@gabinet.pl / haslo123
 * **Fizjoterapeuta:** anna@gabinet.pl / haslo123
 * **Pacjent (Klient):** pacjent@test.pl / haslo123
+
+
+## Autorzy
+
+* **Alan Ossoliński** – [@rudyk0607](https://github.com/rudyk0607) 
+* **Szymon Trojanek** – [@Szopen2137](https://github.com/Szopen2137)
