@@ -21,7 +21,8 @@ Kompletna aplikacja internetowa umożliwiająca pacjentom rezerwowanie terminów
 3. Uruchom moduły Apache i MySQL w panelu kontrolnym serwera.
 4. Przejdź do narzędzia phpMyAdmin (domyślnie `http://localhost/phpmyadmin`) i utwórz pustą bazę danych.
 5. Zaimportuj do nowo utworzonej bazy plik `database.sql`, który znajduje się w folderze `/database/` niniejszego repozytorium.
-6. Uruchom projekt wpisując w pasku adresu przeglądarki: `http://localhost/nazwa-folderu-z-projektem`.
+6. Skopiuj plik includes/config.example.php, zmień jego nazwę na config.php i uzupełnij go własnymi danymi dostępowymi do lokalnego serwera MySQL.
+7. Uruchom projekt wpisując w pasku adresu przeglądarki: `http://localhost/nazwa-folderu-z-projektem`.
 
 ## Testowe dane logowania
 W załączonej bazie danych przygotowano konta testowe z przypisanymi odpowiednimi rolami:
