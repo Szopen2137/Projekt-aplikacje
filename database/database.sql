@@ -6,9 +6,9 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
-    role ENUM('client', 'employee', 'admin') NOT NULL DEFAULT 'client',
+    role VARCHAR(50) NOT NULL DEFAULT 'client',
     active BOOLEAN NOT NULL DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE service_categories (
@@ -22,7 +22,7 @@ CREATE TABLE services (
     category_id INT NOT NULL,
     name VARCHAR(100) NOT NULL,
     description TEXT,
-    duration INT NOT NULL, -- czas w minutach
+    duration INT NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     active BOOLEAN NOT NULL DEFAULT 1,
     FOREIGN KEY (category_id) REFERENCES service_categories(id) ON DELETE CASCADE
@@ -47,7 +47,7 @@ CREATE TABLE employee_services (
 CREATE TABLE employee_availability (
     id INT AUTO_INCREMENT PRIMARY KEY,
     employee_id INT NOT NULL,
-    day_of_week TINYINT NOT NULL, -- 1 = poniedziałek, 7 = niedziela
+    day_of_week DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
@@ -61,9 +61,9 @@ CREATE TABLE reservations (
     reservation_date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
-    status ENUM('oczekująca', 'potwierdzona', 'zrealizowana', 'anulowana') NOT NULL DEFAULT 'oczekująca',
+    status VARCHAR(50) NOT NULL DEFAULT 'oczekująca',
     comment TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (employee_id) REFERENCES employees(id),
     FOREIGN KEY (service_id) REFERENCES services(id)
@@ -92,8 +92,8 @@ INSERT INTO employee_services (employee_id, service_id) VALUES
 (1, 1), (1, 2), (1, 3);
 
 INSERT INTO employee_availability (employee_id, day_of_week, start_time, end_time) VALUES
-(1, 1, '08:00', '16:00'), -- Poniedziałek
-(1, 3, '10:00', '18:00'); -- Środa
+(1, '2026-10-12', '08:00', '16:00'), -- Poniedziałek zapisany jako konkretna data
+(1, '2026-10-14', '10:00', '18:00'); -- Środa zapisana jako konkretna data
 
 INSERT INTO reservations (user_id, employee_id, service_id, reservation_date, start_time, end_time, status) VALUES
 (3, 1, 2, '2026-10-15', '10:00', '11:00', 'potwierdzona'),
