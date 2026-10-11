@@ -29,15 +29,15 @@ W załączonej bazie danych przygotowano konta testowe z przypisanymi odpowiedni
 
 * **Konto Administratora**
   * E-mail: `admin@gabinet.pl`
-  * Hasło: `haslo123`
+  * Hasło: `password`
 
 * **Konto Pracownika (Fizjoterapeuty)**
   * E-mail: `anna@gabinet.pl`
-  * Hasło: `haslo123`
+  * Hasło: `password`
 
 * **Konto Klienta (Pacjenta)**
   * E-mail: `pacjent@test.pl`
-  * Hasło: `haslo123`
+  * Hasło: `password`
 
 ## Funkcje dodatkowe
 *Sekcja zostanie zaktualizowana w późniejszych etapach.* 
