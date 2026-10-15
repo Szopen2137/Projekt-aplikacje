@@ -1,0 +1,37 @@
+services:
+  app:
+    build: .
+    container_name: fizjomed-app
+    ports:
+      - "9002:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: mysql:8.0
+    container_name: fizjomed-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: fizjomed
+    volumes:
+      - ./database/database.sql:/docker-entrypoint-initdb.d/init.sql
+      - db_data:/var/lib/mysql
+    restart: always
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: fizjomed-pma
+    ports:
+      - "9003:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  db_data:
