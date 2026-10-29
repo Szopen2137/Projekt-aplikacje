@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'C:\xampp\htdocs\xampp\Projekt-aplikacje\public\index.php';
+require_once '../includes/config.php';
 
 $isLoggedIn = isset($_SESSION['user_id']);
 $userRole = $_SESSION['role'] ?? null;
