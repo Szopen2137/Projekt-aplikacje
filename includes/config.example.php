@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$db   = ''; // Twoja nazwa bazy danych
+$db   = 'fizjoterapia'; // Twoja nazwa bazy danych
 $user = 'root'; // Domyślny użytkownik 
 $pass = ''; // Twoje hasło!
 $charset = 'utf8mb4';
