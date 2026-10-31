@@ -31,7 +31,7 @@ body {
     line-height: 1.5;
 }
 
-/* ================== Pasek górny (Header) ================== */
+/* ================== Pasek górny ================== */
 .app-header {
     background-color: var(--bg-card);
     border-bottom: 1px solid var(--border-color);
@@ -114,7 +114,7 @@ body {
     gap: 1.5rem;
 }
 
-/* ================== Karty (Card) ================== */
+/* ================== Karty ================== */
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -249,7 +249,7 @@ label {
     width: 100%;
 }
 
-/* ================== Komunikaty (Alerty) ================== */
+/* ================== Komunikaty ================== */
 .alert {
     padding: 0.85rem 1.15rem;
     border-radius: var(--radius);
@@ -382,7 +382,7 @@ label {
 .status-active { background: #dcfce7; color: #15803d; }
 .status-blocked { background: #fee2e2; color: #b91c1c; }
 
-/* ================== Tabele (Admin) ================== */
+/* ================== Tabele ================== */
 .table-container {
     overflow-x: auto;
 }
@@ -411,7 +411,7 @@ label {
     background-color: #f8fafc;
 }
 
-/* ================== Statystyki (Kafelki) ================== */
+/* ================== Statystyki ================== */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -442,7 +442,7 @@ label {
     font-weight: 500;
 }
 
-/* ================== Strona główna (Hero) ================== */
+/* ================== Strona główna ================== */
 .hero-banner {
     background: linear-gradient(135deg, #0d9488 0%, #115e59 100%);
     color: #ffffff;

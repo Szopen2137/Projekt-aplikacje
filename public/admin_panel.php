@@ -1,32 +1,23 @@
 <?php
-session_start();
+require_once '../includes/admin_auth.php';
 require_once '../includes/config.php';
 
-// Ochrona dostępu - tylko administrator
-if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit;
-}
-
-if ($_SESSION['role'] !== 'admin') {
-    // Klient lub pracownik nie ma prawa wstępu do panelu administratora
-    header('Location: ' . ($_SESSION['role'] === 'employee' ? 'employee_panel.php' : 'client_panel.php'));
-    exit;
-}
-
-// Pobranie statystyk użytkowników
+// 5 liczników wymaganych na Dashboardzie w Etapie 3
 $clientsCount = 0;
 $employeesCount = 0;
+$servicesCount = 0;
+$reservationsCount = 0;
+$todayReservationsCount = 0;
 $usersList = [];
 
 try {
-    $countStmt = $pdo->query("SELECT role, COUNT(*) as cnt FROM users GROUP BY role");
-    while ($row = $countStmt->fetch()) {
-        if ($row['role'] === 'client') $clientsCount = (int)$row['cnt'];
-        if ($row['role'] === 'employee') $employeesCount = (int)$row['cnt'];
-    }
+    $clientsCount = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE role = 'client'")->fetchColumn();
+    $employeesCount = (int)$pdo->query("SELECT COUNT(*) FROM employees")->fetchColumn();
+    $servicesCount = (int)$pdo->query("SELECT COUNT(*) FROM services")->fetchColumn();
+    $reservationsCount = (int)$pdo->query("SELECT COUNT(*) FROM reservations")->fetchColumn();
+    $todayReservationsCount = (int)$pdo->query("SELECT COUNT(*) FROM reservations WHERE reservation_date = CURDATE()")->fetchColumn();
 
-    // Pobranie użytkowników zarejestrowanych w systemie
+    // Pobranie ostatnich użytkowników zarejestrowanych w systemie
     $usersStmt = $pdo->query("SELECT id, name, surname, email, phone, role, active, created_at FROM users ORDER BY id DESC LIMIT 10");
     $usersList = $usersStmt->fetchAll();
 } catch (\PDOException $e) {
@@ -38,51 +29,47 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Administratora - Gabinet Fizjoterapii</title>
+    <title>Dashboard Administratora - Gabinet Fizjoterapii</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    <header class="app-header">
-        <div class="header-container">
-            <div class="header-brand">
-                <span class="brand-icon">⚕</span>
-                <span>Fizjo<strong>Med</strong></span>
-            </div>
-            <nav class="header-nav">
-                <span class="user-greeting">Administrator: <strong><?php echo htmlspecialchars($_SESSION['name']); ?></strong></span>
-                <a href="index.php" class="btn btn-outline btn-sm">Strona główna</a>
-                <a href="logout.php" class="btn btn-danger btn-sm">Wyloguj się</a>
-            </nav>
-        </div>
-    </header>
+    <?php require_once '../includes/admin_header.php'; ?>
 
     <main class="panel-container">
         <div class="panel-welcome">
             <div class="badge-role badge-admin">Uprawnienia Administratora</div>
-            <h1>Panel Zarządzania Placówką</h1>
-            <p>Zarządzanie kontami użytkowników, personelem oraz bazą zabiegów gabinetu.</p>
+            <h1>Panel Zarządzania Placówką (Dashboard)</h1>
+            <p>Podsumowanie statystyk gabinetu oraz szybki dostęp do modułów zarządzania.</p>
         </div>
 
-        <!-- Statystyki -->
+        <!-- 5 wymaganych liczników z rzeczywistymi danymi z bazy -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number"><?php echo $clientsCount; ?></div>
-                <div class="stat-title">Zarejestrowani Pacjenci</div>
+                <div class="stat-title">Zarejestrowani Klienci</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number"><?php echo $employeesCount; ?></div>
-                <div class="stat-title">Fizjoterapeuci</div>
+                <div class="stat-title">Pracownicy</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number"><?php echo count($usersList); ?></div>
-                <div class="stat-title">Wszystkie konta w bazie</div>
+                <div class="stat-number"><?php echo $servicesCount; ?></div>
+                <div class="stat-title">Usługi w ofercie</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number"><?php echo $reservationsCount; ?></div>
+                <div class="stat-title">Wszystkie rezerwacje</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number"><?php echo $todayReservationsCount; ?></div>
+                <div class="stat-title">Rezerwacje na dziś</div>
             </div>
         </div>
 
-        <!-- Tabela użytkowników w systemie -->
+        <!-- Tabela ostatnich użytkowników w systemie -->
         <div class="card mt-4">
             <div class="card-header">
-                <h2>Użytkownicy w Bazie Danych (Role i Statusy)</h2>
+                <h2>Ostatnio zarejestrowani użytkownicy</h2>
             </div>
             <div class="card-body">
                 <div class="table-container">
