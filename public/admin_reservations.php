@@ -63,6 +63,29 @@ $sql .= ' ORDER BY r.reservation_date DESC, r.start_time DESC';
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $reservations = $stmt->fetchAll();
+if (isset($_GET['export']) && $_GET['export'] === 'csv') {
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="rezerwacje_' . date('Y-m-d') . '.csv"');
+    $output = fopen('php://output', 'w');
+    fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
+    fputcsv($output, ['ID', 'Data', 'Godzina od', 'Godzina do', 'Pacjent', 'Telefon', 'Fizjoterapeuta', 'Usluga', 'Cena (PLN)', 'Status'], ';');
+    foreach ($reservations as $r) {
+        fputcsv($output, [
+            $r['id'],
+            $r['reservation_date'],
+            substr($r['start_time'], 0, 5),
+            substr($r['end_time'], 0, 5),
+            $r['client_name'] . ' ' . $r['client_surname'],
+            $r['client_phone'] ?? '',
+            $r['emp_name'] . ' ' . $r['emp_surname'],
+            $r['service_name'],
+            number_format((float)$r['service_price'], 2, ',', ''),
+            $r['status']
+        ], ';');
+    }
+    fclose($output);
+    exit;
+}
 
 // Lista pracowników do filtra <select>
 $employeesList = $pdo->query('
@@ -144,8 +167,11 @@ $employeesList = $pdo->query('
 
         <!-- Tabela rezerwacji -->
         <div class="card mt-4">
-            <div class="card-header">
+            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
                 <h2>Lista rezerwacji (<?php echo count($reservations); ?>)</h2>
+                <a href="admin_reservations.php?<?php echo htmlspecialchars(http_build_query(array_merge($_GET, ['export' => 'csv']))); ?>" class="btn btn-secondary btn-sm">
+                    ⬇ Eksportuj do CSV
+                </a>
             </div>
             <div class="card-body">
                 <div class="table-container">
