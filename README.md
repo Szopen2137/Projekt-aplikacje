@@ -23,6 +23,15 @@ W projekcie wdrożono dobre praktyki programistyczne oraz zabezpieczenia aplikac
 - **Ochrona przed XSS:** Dane wyjściowe generowane przez użytkowników są filtrowane za pomocą funkcji `htmlspecialchars()`.
 - **Separacja konfiguracji:** Plik z poświadczeniami bazy danych (`includes/config.php`) został wykluczony z repozytorium za pomocą `.gitignore` na rzecz bezpiecznego szablonu `config.example.php`.
 
+## Panel Administratora (Etap 3)
+Zaimplementowano kompletny panel zarządzania placówką dostępny wyłącznie dla roli `admin`:
+- **Dashboard (`admin_panel.php`):** Rzeczywiste statystyki z bazy danych (liczba pacjentów, pracowników, usług, wszystkich rezerwacji, wizyt na dziś oraz podsumowanie przychodów).
+- **Kategorie usług (`admin_categories.php`):** Pełny CRUD kategorii z ochroną integralności danych (blokada usunięcia kategorii posiadającej przypisane usługi).
+- **Usługi i zabiegi (`admin_services.php`):** Zarządzanie cennikiem, czasem trwania, przypisaniem do kategorii oraz bezpieczna aktywacja/dezaktywacja zabiegów.
+- **Pracownicy i grafik (`admin_employees.php`):** Zarządzanie kadrą, przypisywanie wykonywanych usług w relacji N:M (`employee_services`) oraz definiowanie godzin dostępności (`employee_availability`).
+- **Użytkownicy (`admin_users.php`):** Przeglądanie kont, wyszukiwarka po imieniu, nazwisku i adresie e-mail, zmiana ról oraz blokowanie/odblokowywanie kont (`active`).
+- **Rezerwacje (`admin_reservations.php`):** Lista wszystkich wizyt z wielokrotnym filtrowaniem (data, status, pracownik), zmianą statusów oraz eksportem danych do pliku CSV.
+
 ## Dostęp do aplikacji
 
 ### 1. Wersja online (Zalecana do szybkiego testowania)
