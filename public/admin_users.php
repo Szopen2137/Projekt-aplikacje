@@ -138,13 +138,26 @@ if ($search !== '') {
                                         <td><?php echo htmlspecialchars($u['created_at']); ?></td>
                                         <td>
                                             <?php if ((int)$u['id'] !== (int)$_SESSION['user_id']): ?>
-                                                <form method="POST" action="admin_users.php" style="display:inline;">
-                                                    <input type="hidden" name="action" value="toggle_active">
-                                                    <input type="hidden" name="user_id" value="<?php echo (int)$u['id']; ?>">
-                                                    <button type="submit" class="btn <?php echo ((int)$u['active'] === 1) ? 'btn-danger' : 'btn-primary'; ?> btn-sm">
-                                                        <?php echo ((int)$u['active'] === 1) ? 'Zablokuj' : 'Odblokuj'; ?>
-                                                    </button>
-                                                </form>
+                                                <div style="display:flex; gap:0.4rem; align-items:center; flex-wrap:wrap;">
+                                                    <form method="POST" action="admin_users.php" style="display:inline-flex; gap:0.3rem; align-items:center;">
+                                                        <input type="hidden" name="action" value="change_role">
+                                                        <input type="hidden" name="user_id" value="<?php echo (int)$u['id']; ?>">
+                                                        <select name="role" class="form-control" style="padding:0.25rem 0.4rem; font-size:0.82rem; width:auto;">
+                                                            <option value="client" <?php echo ($u['role'] === 'client') ? 'selected' : ''; ?>>client</option>
+                                                            <option value="employee" <?php echo ($u['role'] === 'employee') ? 'selected' : ''; ?>>employee</option>
+                                                            <option value="admin" <?php echo ($u['role'] === 'admin') ? 'selected' : ''; ?>>admin</option>
+                                                        </select>
+                                                        <button type="submit" class="btn btn-outline btn-sm">Zmień rolę</button>
+                                                    </form>
+
+                                                    <form method="POST" action="admin_users.php" style="display:inline;">
+                                                        <input type="hidden" name="action" value="toggle_active">
+                                                        <input type="hidden" name="user_id" value="<?php echo (int)$u['id']; ?>">
+                                                        <button type="submit" class="btn <?php echo ((int)$u['active'] === 1) ? 'btn-danger' : 'btn-primary'; ?> btn-sm">
+                                                            <?php echo ((int)$u['active'] === 1) ? 'Zablokuj' : 'Odblokuj'; ?>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             <?php else: ?>
                                                 <span class="text-muted" style="font-size:0.82rem;">Twoje konto</span>
                                             <?php endif; ?>
