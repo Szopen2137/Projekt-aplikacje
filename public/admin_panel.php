@@ -8,6 +8,7 @@ $employeesCount = 0;
 $servicesCount = 0;
 $reservationsCount = 0;
 $todayReservationsCount = 0;
+$totalRevenue = 0;
 $usersList = [];
 
 try {
@@ -16,6 +17,12 @@ try {
     $servicesCount = (int)$pdo->query("SELECT COUNT(*) FROM services")->fetchColumn();
     $reservationsCount = (int)$pdo->query("SELECT COUNT(*) FROM reservations")->fetchColumn();
     $todayReservationsCount = (int)$pdo->query("SELECT COUNT(*) FROM reservations WHERE reservation_date = CURDATE()")->fetchColumn();
+    $totalRevenue = (float)$pdo->query("
+        SELECT COALESCE(SUM(s.price), 0)
+        FROM reservations r
+        JOIN services s ON r.service_id = s.id
+        WHERE r.status IN ('potwierdzona', 'zrealizowana')
+    ")->fetchColumn();
 
     // Pobranie ostatnich użytkowników zarejestrowanych w systemie
     $usersStmt = $pdo->query("SELECT id, name, surname, email, phone, role, active, created_at FROM users ORDER BY id DESC LIMIT 10");
@@ -59,6 +66,10 @@ try {
             <div class="stat-card">
                 <div class="stat-number"><?php echo $reservationsCount; ?></div>
                 <div class="stat-title">Wszystkie rezerwacje</div>
+                <div class="stat-card">
+                <div class="stat-number"><?php echo number_format($totalRevenue, 2, ',', ' '); ?> zł</div>
+                <div class="stat-title">Szacowany przychód</div>
+            </div>
             </div>
             <div class="stat-card">
                 <div class="stat-number"><?php echo $todayReservationsCount; ?></div>
