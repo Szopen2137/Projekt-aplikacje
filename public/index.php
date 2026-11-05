@@ -42,7 +42,6 @@ if ($isLoggedIn) {
     </header>
 
     <main class="panel-container">
-        <!-- Baner powitalny Hero -->
         <div class="hero-banner">
             <h1>Profesjonalna Rehabilitacja i Fizjoterapia</h1>
             <p>Witamy w internetowym systemie gabinetu FizjoMed. Zarejestruj się, aby wygodnie zarządzać swoimi wizytami i zabiegami.</p>
@@ -56,7 +55,6 @@ if ($isLoggedIn) {
             </div>
         </div>
 
-        <!-- Karty oferty gabinetu -->
         <div class="stats-grid mt-4">
             <div class="card">
                 <div class="card-body">
@@ -77,7 +75,6 @@ if ($isLoggedIn) {
                 </div>
             </div>
         </div>
-
     </main>
 </body>
 </html>

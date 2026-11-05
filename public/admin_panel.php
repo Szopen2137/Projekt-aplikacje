@@ -2,33 +2,24 @@
 require_once '../includes/admin_auth.php';
 require_once '../includes/config.php';
 
-// 5 liczników wymaganych na Dashboardzie w Etapie 3
 $clientsCount = 0;
 $employeesCount = 0;
 $servicesCount = 0;
 $reservationsCount = 0;
 $todayReservationsCount = 0;
-$totalRevenue = 0;
 $usersList = [];
 
 try {
+    // Statystyki dashboardu
     $clientsCount = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE role = 'client'")->fetchColumn();
     $employeesCount = (int)$pdo->query("SELECT COUNT(*) FROM employees")->fetchColumn();
     $servicesCount = (int)$pdo->query("SELECT COUNT(*) FROM services")->fetchColumn();
     $reservationsCount = (int)$pdo->query("SELECT COUNT(*) FROM reservations")->fetchColumn();
     $todayReservationsCount = (int)$pdo->query("SELECT COUNT(*) FROM reservations WHERE reservation_date = CURDATE()")->fetchColumn();
-    $totalRevenue = (float)$pdo->query("
-        SELECT COALESCE(SUM(s.price), 0)
-        FROM reservations r
-        JOIN services s ON r.service_id = s.id
-        WHERE r.status IN ('potwierdzona', 'zrealizowana')
-    ")->fetchColumn();
 
-    // Pobranie ostatnich użytkowników zarejestrowanych w systemie
     $usersStmt = $pdo->query("SELECT id, name, surname, email, phone, role, active, created_at FROM users ORDER BY id DESC LIMIT 10");
     $usersList = $usersStmt->fetchAll();
 } catch (\PDOException $e) {
-    // Bezpieczna obsługa błędu
 }
 ?>
 <!DOCTYPE html>
@@ -49,7 +40,6 @@ try {
             <p>Podsumowanie statystyk gabinetu oraz szybki dostęp do modułów zarządzania.</p>
         </div>
 
-        <!-- 5 wymaganych liczników z rzeczywistymi danymi z bazy -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number"><?php echo $clientsCount; ?></div>
@@ -66,10 +56,6 @@ try {
             <div class="stat-card">
                 <div class="stat-number"><?php echo $reservationsCount; ?></div>
                 <div class="stat-title">Wszystkie rezerwacje</div>
-                <div class="stat-card">
-                <div class="stat-number"><?php echo number_format($totalRevenue, 2, ',', ' '); ?> zł</div>
-                <div class="stat-title">Szacowany przychód</div>
-            </div>
             </div>
             <div class="stat-card">
                 <div class="stat-number"><?php echo $todayReservationsCount; ?></div>
@@ -77,7 +63,6 @@ try {
             </div>
         </div>
 
-        <!-- Tabela ostatnich użytkowników w systemie -->
         <div class="card mt-4">
             <div class="card-header">
                 <h2>Ostatnio zarejestrowani użytkownicy</h2>

@@ -2,7 +2,6 @@
 session_start();
 require_once '../includes/config.php';
 
-// Jeśli użytkownik jest już zalogowany, przekieruj go do panelu
 if (isset($_SESSION['user_id'])) {
     if ($_SESSION['role'] === 'admin') {
         header('Location: admin_panel.php');
@@ -30,7 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
     $password_repeat = $_POST['password_repeat'] ?? '';
 
-    // 1. Walidacja danych
     if (empty($name) || empty($surname) || empty($email) || empty($password) || empty($password_repeat)) {
         $error = 'Wypełnij wszystkie wymagane pola.';
     } elseif (mb_strlen($name) < 2 || mb_strlen($name) > 50) {
@@ -47,17 +45,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Podane hasła nie są identyczne.';
     } else {
         try {
-            // 2. Sprawdzenie, czy e-mail już istnieje w bazie
             $stmt = $pdo->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
             $stmt->execute(['email' => $email]);
             
             if ($stmt->fetch()) {
                 $error = 'Konto z podanym adresem e-mail już istnieje.';
             } else {
-                // 3. Szyfrowanie hasła
+                // Hashowanie hasła (bcrypt)
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                 
-                // 4. Zapis użytkownika do bazy (domyślnie rola client)
                 $insertStmt = $pdo->prepare('
                     INSERT INTO users (name, surname, email, phone, password, role, active) 
                     VALUES (:name, :surname, :email, :phone, :password, "client", 1)
@@ -73,7 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($result) {
                     $success = 'Rejestracja zakończona sukcesem! Możesz się teraz zalogować.';
-                    // Czyszczenie pól formularza po udanej rejestracji
                     $name = $surname = $email = $phone = '';
                 } else {
                     $error = 'Wystąpił błąd podczas rejestracji. Spróbuj ponownie.';

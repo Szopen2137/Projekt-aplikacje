@@ -2,14 +2,12 @@
 session_start();
 require_once '../includes/config.php';
 
-// Ochrona dostępu - tylko pracownik (fizjoterapeuta)
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
 }
 
 if ($_SESSION['role'] !== 'employee') {
-    // Klient nie może wejść do panelu pracownika
     header('Location: ' . ($_SESSION['role'] === 'admin' ? 'admin_panel.php' : 'client_panel.php'));
     exit;
 }
@@ -18,7 +16,6 @@ $userId = (int)$_SESSION['user_id'];
 $successMsg = '';
 $errorMsg = '';
 
-// Obsługa edycji profilu pracownika
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_profile'])) {
         $name = trim($_POST['name'] ?? '');
@@ -50,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Pobranie danych pracownika z bazy
 $stmt = $pdo->prepare('SELECT name, surname, email, phone, role, created_at FROM users WHERE id = :id');
 $stmt->execute(['id' => $userId]);
 $user = $stmt->fetch();
@@ -98,7 +94,6 @@ $user = $stmt->fetch();
         <?php endif; ?>
 
         <div class="panel-grid">
-            <!-- Dane pracownika -->
             <div class="card">
                 <div class="card-header">
                     <h2>Twoje Dane Pracownicze</h2>
@@ -133,7 +128,6 @@ $user = $stmt->fetch();
                 </div>
             </div>
 
-            <!-- Informacje o wizytach i grafiku -->
             <div class="card">
                 <div class="card-header">
                     <h2>Harmonogram i Wizyty Pacjentów</h2>

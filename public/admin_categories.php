@@ -5,7 +5,6 @@ require_once '../includes/config.php';
 $successMsg = '';
 $errorMsg = '';
 
-// Dane do formularza edycji
 $editCategory = null;
 if (isset($_GET['edit'])) {
     $editId = (int)$_GET['edit'];
@@ -14,7 +13,6 @@ if (isset($_GET['edit'])) {
     $editCategory = $stmt->fetch();
 }
 
-// Obsługa akcji POST (Dodawanie, Edycja, Usuwanie)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
@@ -55,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($action === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
 
-        // Bezpieczna obsługa zależności (wymóg na ocenę 5): sprawdzenie czy do kategorii są przypisane usługi
+        // Blokada usunięcia kategorii posiadającej przypisane usługi
         $checkStmt = $pdo->prepare('SELECT COUNT(*) FROM services WHERE category_id = :id');
         $checkStmt->execute(['id' => $id]);
         $servicesInCat = (int)$checkStmt->fetchColumn();
@@ -74,7 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Pobranie wszystkich kategorii wraz z liczbą przypisanych usług
 $categoriesStmt = $pdo->query('
     SELECT c.*, COUNT(s.id) AS services_count
     FROM service_categories c
@@ -111,7 +108,6 @@ $categories = $categoriesStmt->fetchAll();
         <?php endif; ?>
 
         <div class="panel-grid">
-            <!-- Formularz dodawania / edycji kategorii -->
             <div class="card">
                 <div class="card-header">
                     <h2><?php echo $editCategory ? 'Edytuj kategorię #' . (int)$editCategory['id'] : 'Dodaj nową kategorię'; ?></h2>
@@ -146,7 +142,6 @@ $categories = $categoriesStmt->fetchAll();
                 </div>
             </div>
 
-            <!-- Tabela kategorii -->
             <div class="card">
                 <div class="card-header">
                     <h2>Lista kategorii (<?php echo count($categories); ?>)</h2>
@@ -176,12 +171,14 @@ $categories = $categoriesStmt->fetchAll();
                                             <td><?php echo htmlspecialchars($cat['description'] ?? '—'); ?></td>
                                             <td><?php echo (int)$cat['services_count']; ?></td>
                                             <td>
-                                                <a href="admin_categories.php?edit=<?php echo (int)$cat['id']; ?>" class="btn btn-outline btn-sm">Edytuj</a>
-                                                <form method="POST" action="admin_categories.php" style="display:inline;" onsubmit="return confirm('Czy na pewno chcesz usunąć tę kategorię?');">
-                                                    <input type="hidden" name="action" value="delete">
-                                                    <input type="hidden" name="id" value="<?php echo (int)$cat['id']; ?>">
-                                                    <button type="submit" class="btn btn-danger btn-sm">Usuń</button>
-                                                </form>
+                                                <div class="action-buttons">
+                                                    <a href="admin_categories.php?edit=<?php echo (int)$cat['id']; ?>" class="btn btn-outline btn-sm">Edytuj</a>
+                                                    <form method="POST" action="admin_categories.php" onsubmit="return confirm('Czy na pewno chcesz usunąć tę kategorię?');">
+                                                        <input type="hidden" name="action" value="delete">
+                                                        <input type="hidden" name="id" value="<?php echo (int)$cat['id']; ?>">
+                                                        <button type="submit" class="btn btn-danger btn-sm">Usuń</button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>

@@ -7,7 +7,6 @@ $errorMsg = '';
 
 $allowedStatuses = ['oczekująca', 'potwierdzona', 'zrealizowana', 'anulowana'];
 
-// Zmiana statusu rezerwacji przez administratora
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $reservationId = (int)($_POST['reservation_id'] ?? 0);
     $newStatus = trim($_POST['status'] ?? '');
@@ -25,12 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Parametry filtrowania GET (data, status, pracownik)
 $filterDate = trim($_GET['date'] ?? '');
 $filterStatus = trim($_GET['status'] ?? '');
 $filterEmployee = (int)($_GET['employee_id'] ?? 0);
 
-// Budowanie zapytania z dynamicznymi filtrami (Prepared Statements)
+// Dynamiczne filtrowanie rezerwacji (Prepared Statements)
 $sql = '
     SELECT r.*,
            u_client.name AS client_name, u_client.surname AS client_surname, u_client.phone AS client_phone,
@@ -63,31 +61,7 @@ $sql .= ' ORDER BY r.reservation_date DESC, r.start_time DESC';
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $reservations = $stmt->fetchAll();
-if (isset($_GET['export']) && $_GET['export'] === 'csv') {
-    header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename="rezerwacje_' . date('Y-m-d') . '.csv"');
-    $output = fopen('php://output', 'w');
-    fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
-    fputcsv($output, ['ID', 'Data', 'Godzina od', 'Godzina do', 'Pacjent', 'Telefon', 'Fizjoterapeuta', 'Usluga', 'Cena (PLN)', 'Status'], ';');
-    foreach ($reservations as $r) {
-        fputcsv($output, [
-            $r['id'],
-            $r['reservation_date'],
-            substr($r['start_time'], 0, 5),
-            substr($r['end_time'], 0, 5),
-            $r['client_name'] . ' ' . $r['client_surname'],
-            $r['client_phone'] ?? '',
-            $r['emp_name'] . ' ' . $r['emp_surname'],
-            $r['service_name'],
-            number_format((float)$r['service_price'], 2, ',', ''),
-            $r['status']
-        ], ';');
-    }
-    fclose($output);
-    exit;
-}
 
-// Lista pracowników do filtra <select>
 $employeesList = $pdo->query('
     SELECT e.id, u.name, u.surname
     FROM employees e
@@ -121,7 +95,6 @@ $employeesList = $pdo->query('
             <div class="alert alert-success"><?php echo htmlspecialchars($successMsg); ?></div>
         <?php endif; ?>
 
-        <!-- Formularz filtrowania według daty, statusu i pracownika -->
         <div class="card">
             <div class="card-header">
                 <h2>Filtrowanie rezerwacji</h2>
@@ -165,13 +138,9 @@ $employeesList = $pdo->query('
             </div>
         </div>
 
-        <!-- Tabela rezerwacji -->
         <div class="card mt-4">
-            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="card-header">
                 <h2>Lista rezerwacji (<?php echo count($reservations); ?>)</h2>
-                <a href="admin_reservations.php?<?php echo htmlspecialchars(http_build_query(array_merge($_GET, ['export' => 'csv']))); ?>" class="btn btn-secondary btn-sm">
-                    ⬇ Eksportuj do CSV
-                </a>
             </div>
             <div class="card-body">
                 <div class="table-container">

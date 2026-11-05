@@ -5,10 +5,8 @@ require_once '../includes/config.php';
 $successMsg = '';
 $errorMsg = '';
 
-// Pobranie kategorii do pola <select>
 $categories = $pdo->query('SELECT id, name FROM service_categories ORDER BY name ASC')->fetchAll();
 
-// Dane do edycji usługi
 $editService = null;
 if (isset($_GET['edit'])) {
     $editId = (int)$_GET['edit'];
@@ -17,7 +15,6 @@ if (isset($_GET['edit'])) {
     $editService = $stmt->fetch();
 }
 
-// Obsługa formularzy POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
@@ -29,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $duration = (int)($_POST['duration'] ?? 0);
         $price = str_replace(',', '.', trim($_POST['price'] ?? '0'));
 
-        // Walidacja serwerowa (wymóg na ocenę 5)
         if (empty($name) || $categoryId <= 0) {
             $errorMsg = 'Podaj nazwę usługi oraz wybierz kategorię.';
         } elseif ($duration <= 0 || $duration > 480) {
@@ -83,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif ($action === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
-        // Sprawdzenie czy usługa ma już przypisane rezerwacje (bezpieczna obsługa zależności na ocenę 5)
+        // Blokada usunięcia usługi posiadającej historię rezerwacji
         $resCheck = $pdo->prepare('SELECT COUNT(*) FROM reservations WHERE service_id = :id');
         $resCheck->execute(['id' => $id]);
         if ((int)$resCheck->fetchColumn() > 0) {
@@ -100,7 +96,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Pobranie listy usług wraz z nazwą kategorii (JOIN)
 $services = $pdo->query('
     SELECT s.*, c.name AS category_name
     FROM services s
@@ -134,7 +129,6 @@ $services = $pdo->query('
             <div class="alert alert-success"><?php echo htmlspecialchars($successMsg); ?></div>
         <?php endif; ?>
 
-        <!-- Formularz dodawania / edycji usługi -->
         <div class="card">
             <div class="card-header">
                 <h2><?php echo $editService ? 'Edytuj usługę #' . (int)$editService['id'] : 'Dodaj nową usługę'; ?></h2>
@@ -198,7 +192,6 @@ $services = $pdo->query('
             </div>
         </div>
 
-        <!-- Tabela wszystkich usług -->
         <div class="card mt-4">
             <div class="card-header">
                 <h2>Lista usług w systemie (<?php echo count($services); ?>)</h2>
@@ -233,29 +226,31 @@ $services = $pdo->query('
                                             <?php endif; ?>
                                         </td>
                                         <td><?php echo htmlspecialchars($srv['category_name']); ?></td>
-                                        <td><?php echo (int)$srv['duration']; ?> min</td>
-                                        <td><strong><?php echo number_format((float)$srv['price'], 2, ',', ' '); ?> zł</strong></td>
+                                        <td style="white-space:nowrap;"><?php echo (int)$srv['duration']; ?> min</td>
+                                        <td style="white-space:nowrap;"><strong><?php echo number_format((float)$srv['price'], 2, ',', ' '); ?> zł</strong></td>
                                         <td>
                                             <span class="status-badge <?php echo ((int)$srv['active'] === 1) ? 'status-active' : 'status-blocked'; ?>">
                                                 <?php echo ((int)$srv['active'] === 1) ? 'Aktywna' : 'Nieaktywna'; ?>
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="admin_services.php?edit=<?php echo (int)$srv['id']; ?>" class="btn btn-outline btn-sm">Edytuj</a>
+                                            <div class="action-buttons">
+                                                <a href="admin_services.php?edit=<?php echo (int)$srv['id']; ?>" class="btn btn-outline btn-sm">Edytuj</a>
 
-                                            <form method="POST" action="admin_services.php" style="display:inline;">
-                                                <input type="hidden" name="action" value="toggle_active">
-                                                <input type="hidden" name="id" value="<?php echo (int)$srv['id']; ?>">
-                                                <button type="submit" class="btn btn-secondary btn-sm">
-                                                    <?php echo ((int)$srv['active'] === 1) ? 'Dezaktywuj' : 'Aktywuj'; ?>
-                                                </button>
-                                            </form>
+                                                <form method="POST" action="admin_services.php">
+                                                    <input type="hidden" name="action" value="toggle_active">
+                                                    <input type="hidden" name="id" value="<?php echo (int)$srv['id']; ?>">
+                                                    <button type="submit" class="btn btn-secondary btn-sm">
+                                                        <?php echo ((int)$srv['active'] === 1) ? 'Dezaktywuj' : 'Aktywuj'; ?>
+                                                    </button>
+                                                </form>
 
-                                            <form method="POST" action="admin_services.php" style="display:inline;" onsubmit="return confirm('Czy na pewno chcesz usunąć tę usługę?');">
-                                                <input type="hidden" name="action" value="delete">
-                                                <input type="hidden" name="id" value="<?php echo (int)$srv['id']; ?>">
-                                                <button type="submit" class="btn btn-danger btn-sm">Usuń</button>
-                                            </form>
+                                                <form method="POST" action="admin_services.php" onsubmit="return confirm('Czy na pewno chcesz usunąć tę usługę?');">
+                                                    <input type="hidden" name="action" value="delete">
+                                                    <input type="hidden" name="id" value="<?php echo (int)$srv['id']; ?>">
+                                                    <button type="submit" class="btn btn-danger btn-sm">Usuń</button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

@@ -5,7 +5,6 @@ require_once '../includes/config.php';
 $successMsg = '';
 $errorMsg = '';
 
-// Obsługa akcji POST (dodawanie pracownika, edycja opisu, przypisywanie usług N:M, grafik dostępności)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
@@ -18,11 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             try {
                 $pdo->beginTransaction();
-                // Ustawienie roli użytkownika na 'employee'
                 $uStmt = $pdo->prepare("UPDATE users SET role = 'employee' WHERE id = :id");
                 $uStmt->execute(['id' => $userId]);
 
-                // Sprawdzenie czy już ma wpis w tabeli employees
                 $checkStmt = $pdo->prepare('SELECT id FROM employees WHERE user_id = :user_id');
                 $checkStmt->execute(['user_id' => $userId]);
                 if (!$checkStmt->fetch()) {
@@ -44,11 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo->beginTransaction();
 
-            // Aktualizacja opisu pracownika
             $upStmt = $pdo->prepare('UPDATE employees SET description = :description WHERE id = :id');
             $upStmt->execute(['description' => $description, 'id' => $employeeId]);
 
-            // Aktualizacja przypisanych usług (Relacja N:M w employee_services)
+            // Relacja N:M w tabeli employee_services
             $delSrv = $pdo->prepare('DELETE FROM employee_services WHERE employee_id = :emp_id');
             $delSrv->execute(['emp_id' => $employeeId]);
 
@@ -116,7 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Pobranie listy pracowników (połączenie employees + users)
 $employees = $pdo->query('
     SELECT e.id AS employee_id, e.user_id, e.description, e.active, u.name, u.surname, u.email, u.phone
     FROM employees e
@@ -124,17 +119,14 @@ $employees = $pdo->query('
     ORDER BY e.id ASC
 ')->fetchAll();
 
-// Pobranie wszystkich usług do checkboxów N:M
 $allServices = $pdo->query('SELECT id, name, duration, price FROM services ORDER BY name ASC')->fetchAll();
 
-// Pobranie przypisań N:M (employee_services)
 $empServicesRaw = $pdo->query('SELECT employee_id, service_id FROM employee_services')->fetchAll();
 $empServicesMap = [];
 foreach ($empServicesRaw as $row) {
     $empServicesMap[(int)$row['employee_id']][] = (int)$row['service_id'];
 }
 
-// Pobranie dostępności pracowników (employee_availability)
 $availabilities = $pdo->query('
     SELECT ea.*, u.name, u.surname
     FROM employee_availability ea
@@ -143,7 +135,6 @@ $availabilities = $pdo->query('
     ORDER BY ea.day_of_week DESC, ea.start_time ASC
 ')->fetchAll();
 
-// Użytkownicy, którzy nie są jeszcze w tabeli employees (do awansowania na pracownika)
 $availableUsers = $pdo->query('
     SELECT id, name, surname, email
     FROM users
@@ -177,7 +168,6 @@ $availableUsers = $pdo->query('
             <div class="alert alert-success"><?php echo htmlspecialchars($successMsg); ?></div>
         <?php endif; ?>
 
-        <!-- Sekcja 1: Lista pracowników i przypisywanie usług N:M -->
         <div class="card">
             <div class="card-header">
                 <h2>Kadra Fizjoterapeutów i Przypisane Zabiegi</h2>
@@ -247,7 +237,6 @@ $availableUsers = $pdo->query('
         </div>
 
         <div class="panel-grid mt-4">
-            <!-- Sekcja 2: Dodawanie godzin pracy (Dostępność) -->
             <div class="card">
                 <div class="card-header">
                     <h2>Dodaj Godziny Pracy (Grafik)</h2>
@@ -290,7 +279,6 @@ $availableUsers = $pdo->query('
                 </div>
             </div>
 
-            <!-- Sekcja 3: Mianowanie użytkownika pracownikiem -->
             <div class="card">
                 <div class="card-header">
                     <h2>Dodaj Nowego Pracownika</h2>
@@ -327,7 +315,6 @@ $availableUsers = $pdo->query('
             </div>
         </div>
 
-        <!-- Tabela aktualnego grafiku dostępności -->
         <div class="card mt-4">
             <div class="card-header">
                 <h2>Zdefiniowany Grafik Dostępności Pracowników</h2>

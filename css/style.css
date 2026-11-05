@@ -31,7 +31,6 @@ body {
     line-height: 1.5;
 }
 
-/* ================== Pasek górny ================== */
 .app-header {
     background-color: var(--bg-card);
     border-bottom: 1px solid var(--border-color);
@@ -87,7 +86,6 @@ body {
     margin-right: 0.5rem;
 }
 
-/* ================== Układ panelu i treści ================== */
 .panel-container {
     max-width: 1100px;
     margin: 2rem auto;
@@ -114,7 +112,6 @@ body {
     gap: 1.5rem;
 }
 
-/* ================== Karty ================== */
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -143,7 +140,6 @@ body {
     border-color: #99f6e4;
 }
 
-/* ================== Formularze ================== */
 .form-group {
     margin-bottom: 1rem;
 }
@@ -188,18 +184,34 @@ label {
     cursor: not-allowed;
 }
 
-/* ================== Przyciski ================== */
 .btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.6rem 1.2rem;
+    font-family: inherit;
     font-size: 0.95rem;
     font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
     text-align: center;
     text-decoration: none;
     border-radius: var(--radius);
     border: 1px solid transparent;
     cursor: pointer;
     transition: all 0.15s ease;
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: nowrap;
+}
+
+.action-buttons form {
+    margin: 0;
+    display: inline-flex;
 }
 
 .btn-primary {
@@ -249,7 +261,6 @@ label {
     width: 100%;
 }
 
-/* ================== Komunikaty ================== */
 .alert {
     padding: 0.85rem 1.15rem;
     border-radius: var(--radius);
@@ -269,7 +280,6 @@ label {
     border: 1px solid #bbf7d0;
 }
 
-/* ================== Logowanie i Rejestracja ================== */
 .auth-page {
     background-color: #f1f5f9;
     display: flex;
@@ -339,7 +349,6 @@ label {
     font-weight: normal !important;
 }
 
-/* ================== Odznaki i role ================== */
 .badge-role {
     display: inline-block;
     padding: 0.2rem 0.6rem;
@@ -382,7 +391,6 @@ label {
 .status-active { background: #dcfce7; color: #15803d; }
 .status-blocked { background: #fee2e2; color: #b91c1c; }
 
-/* ================== Tabele ================== */
 .table-container {
     overflow-x: auto;
 }
@@ -411,7 +419,6 @@ label {
     background-color: #f8fafc;
 }
 
-/* ================== Statystyki ================== */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -442,7 +449,6 @@ label {
     font-weight: 500;
 }
 
-/* ================== Strona główna ================== */
 .hero-banner {
     background: linear-gradient(135deg, #0d9488 0%, #115e59 100%);
     color: #ffffff;
@@ -487,27 +493,6 @@ label {
     background: rgba(255, 255, 255, 0.15);
 }
 
-.test-accounts {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.test-account {
-    background: #ffffff;
-    padding: 0.6rem 0.85rem;
-    border-radius: 6px;
-    border: 1px solid #ccfbf1;
-    font-size: 0.9rem;
-}
-
-.test-account code {
-    background: #f1f5f9;
-    padding: 0.1rem 0.3rem;
-    border-radius: 4px;
-}
-
-/* ================== Elementy pomocnicze ================== */
 .mt-2 { margin-top: 0.5rem; }
 .mt-4 { margin-top: 1.5rem; }
 .mb-2 { margin-bottom: 0.5rem; }
@@ -525,7 +510,6 @@ label {
     font-size: 0.92rem;
 }
 
-/* ================== Responsywność ================== */
 @media (max-width: 650px) {
     .header-container {
         flex-direction: column;

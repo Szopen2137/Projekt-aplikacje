@@ -2,7 +2,6 @@
 session_start();
 require_once '../includes/config.php';
 
-// Jeśli użytkownik jest już zalogowany, przekieruj go do odpowiedniego panelu
 if (isset($_SESSION['user_id'])) {
     if ($_SESSION['role'] === 'admin') {
         header('Location: admin_panel.php');

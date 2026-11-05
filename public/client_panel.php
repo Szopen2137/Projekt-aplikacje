@@ -2,14 +2,12 @@
 session_start();
 require_once '../includes/config.php';
 
-// Ochrona dostępu po stronie serwera
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
 }
 
 if ($_SESSION['role'] !== 'client') {
-    // Jeśli próbuje wejść pracownik lub admin, przekieruj do właściwego panelu
     header('Location: ' . ($_SESSION['role'] === 'admin' ? 'admin_panel.php' : 'employee_panel.php'));
     exit;
 }
@@ -18,7 +16,6 @@ $userId = (int)$_SESSION['user_id'];
 $successMsg = '';
 $errorMsg = '';
 
-// Obsługa edycji profilu (wymóg etapu 2 na ocenę 4 i 5)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_profile'])) {
         $name = trim($_POST['name'] ?? '');
@@ -79,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Pobranie aktualnych danych pacjenta z bazy
 $userStmt = $pdo->prepare('SELECT name, surname, email, phone, role, created_at FROM users WHERE id = :id');
 $userStmt->execute(['id' => $userId]);
 $user = $userStmt->fetch();
@@ -126,7 +122,6 @@ $user = $userStmt->fetch();
         <?php endif; ?>
 
         <div class="panel-grid">
-            <!-- Karta 1: Edycja danych profilu (Wymóg etapu 2) -->
             <div class="card">
                 <div class="card-header">
                     <h2>Twoje Dane Profilu</h2>
@@ -161,7 +156,6 @@ $user = $userStmt->fetch();
                 </div>
             </div>
 
-            <!-- Karta 2: Zmiana hasła (Bezpieczeństwo konta) -->
             <div class="card">
                 <div class="card-header">
                     <h2>Bezpieczeństwo - Zmiana Hasła</h2>
@@ -191,7 +185,6 @@ $user = $userStmt->fetch();
             </div>
         </div>
 
-        <!-- Informacja o kolejnych etapach projektu -->
         <div class="card mt-4 info-card">
             <div class="card-body">
                 <h3>🗓️ Rezerwacja Zabiegów Fizjoterapii</h3>
