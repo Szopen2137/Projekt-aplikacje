@@ -1,3 +1,6 @@
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- Tworzenie tabel
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
