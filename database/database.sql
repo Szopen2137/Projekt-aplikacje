@@ -1,7 +1,6 @@
 SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
 
--- Tworzenie tabel
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
@@ -72,8 +71,6 @@ CREATE TABLE reservations (
     FOREIGN KEY (service_id) REFERENCES services(id)
 );
 
--- Hasło dla wszystkich kont to: haslo123
-
 INSERT INTO users (name, surname, email, password, phone, role) VALUES
 ('Jan', 'Kowalski', 'admin@gabinet.pl', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '111222333', 'admin'),
 ('Anna', 'Nowak', 'anna@gabinet.pl', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '444555666', 'employee'),
@@ -95,9 +92,12 @@ INSERT INTO employee_services (employee_id, service_id) VALUES
 (1, 1), (1, 2), (1, 3);
 
 INSERT INTO employee_availability (employee_id, day_of_week, start_time, end_time) VALUES
-(1, '2026-10-12', '08:00', '16:00'), -- Poniedziałek zapisany jako konkretna data
-(1, '2026-10-14', '10:00', '18:00'); -- Środa zapisana jako konkretna data
+(1, '2026-11-16', '08:00', '16:00'),
+(1, '2026-11-17', '08:00', '16:00'),
+(1, '2026-11-18', '10:00', '18:00'),
+(1, '2026-11-19', '08:00', '16:00'),
+(1, '2026-11-20', '08:00', '16:00');
 
 INSERT INTO reservations (user_id, employee_id, service_id, reservation_date, start_time, end_time, status) VALUES
-(3, 1, 2, '2026-10-15', '10:00', '11:00', 'potwierdzona'),
-(3, 1, 3, '2026-10-20', '14:00', '14:15', 'oczekująca');
+(3, 1, 2, '2026-11-23', '10:00', '11:00', 'potwierdzona'),
+(3, 1, 3, '2026-11-25', '14:00', '14:15', 'oczekująca');

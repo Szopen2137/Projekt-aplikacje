@@ -32,6 +32,14 @@ Zaimplementowano kompletny panel zarządzania placówką dostępny wyłącznie d
 - **Użytkownicy (`admin_users.php`):** Przeglądanie kont, wyszukiwarka po imieniu, nazwisku i adresie e-mail, zmiana ról oraz blokowanie/odblokowywanie kont (`active`).
 - **Rezerwacje (`admin_reservations.php`):** Lista wszystkich wizyt z wielokrotnym filtrowaniem (data, status, pracownik), zmianą statusów oraz eksportem danych do pliku CSV.
 
+## Część Klienta, System Rezerwacji i Panel Pracownika (Etap 4)
+Wdrożono główną logikę biznesową systemu rezerwacji oraz dedykowane panele dla pacjentów i fizjoterapeutów:
+- **Publiczna oferta usług (`index.php`):** Katalog aktywnych zabiegów z filtrowaniem według kategorii, wyszukiwarką tekstową, czasem trwania, ceną oraz informacją o przypisanych specjalistach.
+- **5-etapowy proces rezerwacji (`client_panel.php` + `js/script.js`):** Obowiązkowa kolejność kroków `usługa -> pracownik -> data -> godzina -> potwierdzenie` z dynamicznym pobieraniem dostępnych fizjoterapeutów i wolnych slotów czasowych przez AJAX (`fetch`).
+- **Wykrywanie konfliktów przedziałów czasowych i ochrona przed wyścigiem (Race Condition):** System uwzględnia godziny pracy fizjoterapeuty, czas trwania wybranego zabiegu oraz blokuje wszystkie częściowo i całkowicie nakładające się terminy według reguły `start_nowej < koniec_istniejącej AND koniec_nowej > start_istniejącej`. Bezpośrednio przed zapisem w bazie serwer ponownie weryfikuje dostępność w transakcji SQL z blokadą `SELECT ... FOR UPDATE`.
+- **Panel klienta (`client_panel.php`):** Podział własnych wizyt na nadchodzące oraz historię/anulowane, możliwość anulowania własnej przyszłej rezerwacji, opcja przełożenia terminu wizyty z walidacją konfliktów oraz edycja profilu i zmiana hasła.
+- **Panel pracownika (`employee_panel.php`):** Podział własnych wizyt fizjoterapeuty na wizyty dzisiejsze, przyszłe oraz historię, widok szczegółów rezerwacji i danych kontaktowych pacjenta, zmiana statusu obsługiwanej wizyty (`oczekująca`, `potwierdzona`, `zrealizowana`, `anulowana`), zarządzanie własnym grafikiem dostępności oraz ścisła kontrola własności po stronie serwera (brak dostępu do wizyt innego pracownika).
+
 ## Dostęp do aplikacji
 
 ### 1. Wersja online (Zalecana do szybkiego testowania)
@@ -57,7 +65,8 @@ W bazie danych przygotowano konta testowe z przypisanymi odpowiednimi rolami:
 | **Klient (Pacjent)** | `pacjent@test.pl` | `password` | `client_panel.php` |
 
 ## Funkcje dodatkowe
-*Sekcja zostanie zaktualizowana w późniejszych etapach.* 
-Obecnie planowane jest wdrożenie następujących funkcji dodatkowych, wykraczających poza wymagania podstawowe:
-- Zastosowanie technologii AJAX do dynamicznego pobierania dostępnych terminów.
-- Rejestrowanie historii zmian statusów rezerwacji wizyt.
+W projekcie zaimplementowano i zintegrowano następujące funkcje dodatkowe:
+- **Dynamiczne pobieranie terminów (AJAX / Fetch API):** Interaktywny wybór usługi, fizjoterapeuty, dni dyżurów oraz wolnych i zajętych przedziałów godzinowych bez przeładowywania strony.
+- **Przełożenie terminu wizyty przez klienta:** Możliwość zmiany daty i godziny własnej przyszłej rezerwacji z pełną walidacją godzin pracy i konfliktów przedziałów czasowych.
+- **Zarządzanie własnym grafikiem przez pracownika:** Fizjoterapeuta może samodzielnie dodawać i aktualizować godziny swoich dyżurów w panelu pracownika.
+- **Wyszukiwarka i filtrowanie oferty oraz użytkowników:** Filtrowanie zabiegów po kategoriach i frazie na stronie głównej oraz wyszukiwarka użytkowników i wielokryterialne filtrowanie rezerwacji w panelu administratora.
