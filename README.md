@@ -47,13 +47,13 @@ Aplikacja została wdrożona na serwerze zewnętrznym i jest dostępna pod adres
 
 ### 2. Instrukcja uruchomienia lokalnego
 1. Upewnij się, że posiadasz zainstalowane środowisko serwera lokalnego obsługujące PHP i MySQL (np. XAMPP).
-2. Sklonuj niniejsze repozytorium do głównego katalogu serwera (np. `C:\xampp\htdocs\Projekt-aplikacje`)[cite: 3, 4].
+2. Sklonuj niniejsze repozytorium do głównego katalogu serwera (np. `C:\xampp\htdocs\Projekt-aplikacje`).
 3. Uruchom moduły **Apache** oraz **MySQL** w panelu kontrolnym XAMPP.
 4. Przejdź do narzędzia phpMyAdmin (`http://localhost/phpmyadmin`) i utwórz nową, pustą bazę danych (np. `fizjoterapia`).
 5. Zaimportuj do nowo utworzonej bazy plik `database.sql` (znajdujący się w folderze `/database/` lub głównym katalogu repozytorium).
 6. Przejdź do folderu `includes/`, skopiuj plik `config.example.php` i zmień nazwę kopii na `config.php`.
 7. Otwórz plik `includes/config.php` i wpisz w nim nazwę swojej bazy danych (w zmiennej `$db`).
-8. Uruchom projekt wpisując w pasku adresu przeglądarki: `http://localhost/Projekt-aplikacje/public/index.php`[cite: 4].
+8. Uruchom projekt wpisując w pasku adresu przeglądarki: `http://localhost/Projekt-aplikacje/public/index.php`.
 
 ## Testowe dane logowania
 W bazie danych przygotowano konta testowe z przypisanymi odpowiednimi rolami:
