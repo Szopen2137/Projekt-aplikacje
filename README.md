@@ -1,72 +1,120 @@
-# System Rezerwacji Usług - Gabinet Fizjoterapii
+# System Rezerwacji Usług – Gabinet Fizjoterapii (FizjoMed)
 
-🌐 **Wersja na stronie:** [https://fizjo.dziadu.dev/](https://fizjo.dziadu.dev/)
+🌐 **Wersja online (live):** [https://fizjo.dziadu.dev/](https://fizjo.dziadu.dev/)
 
-## Autorzy
-- **Alan Ossoliński** – [@rudyk0607](https://github.com/rudyk0607) 
+## Autorzy projektu
+- **Alan Ossoliński** – [@rudyk0607](https://github.com/rudyk0607)
 - **Szymon Trojanek** – [@Szopen2137](https://github.com/Szopen2137)
 
+---
+
 ## Opis systemu
-Kompletna aplikacja internetowa umożliwiająca pacjentom rezerwowanie terminów zabiegów fizjoterapeutycznych. System wspiera obsługę gabinetu poprzez dedykowane panele dla trzech ról: klienta (pacjenta), pracownika (fizjoterapeuty) oraz administratora zarządzającego placówką, ofertą i personelem.
+Kompletna aplikacja internetowa wspomagająca obsługę gabinetu fizjoterapii oraz umożliwiająca pacjentom rezerwację terminów zabiegów online. System realizuje podział na trzy niezależne role użytkowników:
+- **Klient (Pacjent)** – przegląda ofertę zabiegów, wybiera fizjoterapeutę oraz wolny termin z graficznego kalendarza, składa rezerwacje, przekłada lub anuluje nadchodzące wizyty oraz zarządza swoim profilem.
+- **Pracownik (Fizjoterapeuta)** – obsługuje własny harmonogram wizyt (z podziałem na dzisiejsze, przyszłe oraz historię), przegląda szczegóły pacjentów, zmienia statusy realizowanych zabiegów oraz zarządza własnymi godzinami dyżurów.
+- **Administrator** – zarządza całą placówką: kategoriami, cennikiem i czasem trwania usług, personelem, przypisaniem usług w relacji N:M, grafikiem dostępności, kontami użytkowników oraz wszystkimi rezerwacjami.
+
+---
 
 ## Zastosowane technologie
-- **Backend:** PHP 8+ (z wykorzystaniem biblioteki PDO)
-- **Baza danych:** MySQL / MariaDB (zgodna z 3NF)
-- **Frontend:** HTML5, CSS3 (Pico CSS), JavaScript
-- **Kontrola wersji i wdrożenie:** Git, GitHub, własny serwer produkcyjny
+- **Backend:** PHP 8+ (architektura oparta na PDO i zapytaniach przygotowanych *Prepared Statements*)
+- **Baza danych:** MySQL / MariaDB (znormalizowana relacyjna baza danych, kodowanie `utf8mb4`)
+- **Frontend:** HTML5, CSS3 (responsywny interfejs własny), JavaScript (ES6+, Fetch API / AJAX)
+- **Kontrola wersji i wdrożenie:** Git, GitHub, Docker / serwer produkcyjny
 
-## Architektura i bezpieczeństwo (Etap 1 i 2)
-W projekcie wdrożono dobre praktyki programistyczne oraz zabezpieczenia aplikacyjne:
-- **Ochrona przed SQL Injection:** Wszystkie zapytania do bazy danych są realizowane przez bibliotekę PDO z użyciem zapytań przygotowanych (*Prepared Statements*).
-- **Kryptografia haseł:** Hasła użytkowników są bezpiecznie hashowane algorytmem `bcrypt` za pomocą funkcji `password_hash()` oraz weryfikowane przez `password_verify()`.
-- **Bezpieczeństwo sesji i autoryzacja (RBAC):** Zastosowano regenerację identyfikatora sesji przy logowaniu (`session_regenerate_id`) chroniącą przed atakiem *Session Fixation* oraz ścisłą kontrolę dostępu do paneli na podstawie ról.
-- **Ochrona przed XSS:** Dane wyjściowe generowane przez użytkowników są filtrowane za pomocą funkcji `htmlspecialchars()`.
-- **Separacja konfiguracji:** Plik z poświadczeniami bazy danych (`includes/config.php`) został wykluczony z repozytorium za pomocą `.gitignore` na rzecz bezpiecznego szablonu `config.example.php`.
+---
 
-## Panel Administratora (Etap 3)
-Zaimplementowano kompletny panel zarządzania placówką dostępny wyłącznie dla roli `admin`:
-- **Dashboard (`admin_panel.php`):** Rzeczywiste statystyki z bazy danych (liczba pacjentów, pracowników, usług, wszystkich rezerwacji, wizyt na dziś oraz podsumowanie przychodów).
-- **Kategorie usług (`admin_categories.php`):** Pełny CRUD kategorii z ochroną integralności danych (blokada usunięcia kategorii posiadającej przypisane usługi).
-- **Usługi i zabiegi (`admin_services.php`):** Zarządzanie cennikiem, czasem trwania, przypisaniem do kategorii oraz bezpieczna aktywacja/dezaktywacja zabiegów.
-- **Pracownicy i grafik (`admin_employees.php`):** Zarządzanie kadrą, przypisywanie wykonywanych usług w relacji N:M (`employee_services`) oraz definiowanie godzin dostępności (`employee_availability`).
-- **Użytkownicy (`admin_users.php`):** Przeglądanie kont, wyszukiwarka po imieniu, nazwisku i adresie e-mail, zmiana ról oraz blokowanie/odblokowywanie kont (`active`).
-- **Rezerwacje (`admin_reservations.php`):** Lista wszystkich wizyt z wielokrotnym filtrowaniem (data, status, pracownik), zmianą statusów oraz eksportem danych do pliku CSV.
+## Zrealizowany zakres projektu
 
-## Część Klienta, System Rezerwacji i Panel Pracownika (Etap 4)
-Wdrożono główną logikę biznesową systemu rezerwacji oraz dedykowane panele dla pacjentów i fizjoterapeutów:
-- **Publiczna oferta usług (`index.php`):** Katalog aktywnych zabiegów z filtrowaniem według kategorii, wyszukiwarką tekstową, czasem trwania, ceną oraz informacją o przypisanych specjalistach.
-- **5-etapowy proces rezerwacji (`client_panel.php` + `js/script.js`):** Obowiązkowa kolejność kroków `usługa -> pracownik -> data -> godzina -> potwierdzenie` z dynamicznym pobieraniem dostępnych fizjoterapeutów i wolnych slotów czasowych przez AJAX (`fetch`).
-- **Wykrywanie konfliktów przedziałów czasowych i ochrona przed wyścigiem (Race Condition):** System uwzględnia godziny pracy fizjoterapeuty, czas trwania wybranego zabiegu oraz blokuje wszystkie częściowo i całkowicie nakładające się terminy według reguły `start_nowej < koniec_istniejącej AND koniec_nowej > start_istniejącej`. Bezpośrednio przed zapisem w bazie serwer ponownie weryfikuje dostępność w transakcji SQL z blokadą `SELECT ... FOR UPDATE`.
-- **Panel klienta (`client_panel.php`):** Podział własnych wizyt na nadchodzące oraz historię/anulowane, możliwość anulowania własnej przyszłej rezerwacji, opcja przełożenia terminu wizyty z walidacją konfliktów oraz edycja profilu i zmiana hasła.
-- **Panel pracownika (`employee_panel.php`):** Podział własnych wizyt fizjoterapeuty na wizyty dzisiejsze, przyszłe oraz historię, widok szczegółów rezerwacji i danych kontaktowych pacjenta, zmiana statusu obsługiwanej wizyty (`oczekująca`, `potwierdzona`, `zrealizowana`, `anulowana`), zarządzanie własnym grafikiem dostępności oraz ścisła kontrola własności po stronie serwera (brak dostępu do wizyt innego pracownika).
+### 1. Baza danych i bezpieczeństwo (Etap 1 i 2)
+- **Relacyjna baza danych:** 7 powiązanych tabel (`users`, `service_categories`, `services`, `employees`, `employee_services`, `employee_availability`, `reservations`) z kluczami obcymi oraz tabelą pośredniczącą realizującą relację `N:M` między fizjoterapeutami a usługami.
+- **Ochrona przed SQL Injection:** Wszystkie zapytania z danymi wejściowymi korzystają z bindowania parametrów w PDO (`ATTR_EMULATE_PREPARES => false`).
+- **Bezpieczeństwo haseł i sesji:** Haszowanie haseł za pomocą `password_hash()` (`bcrypt`), weryfikacja przez `password_verify()`, regeneracja ID sesji przy logowaniu (`session_regenerate_id()`) oraz weryfikacja ról i aktywności konta po stronie serwera.
+- **Ochrona przed XSS i kontrola własności danych:** Filtrowanie wszystkich danych wyjściowych przez `htmlspecialchars()` oraz ścisła weryfikacja właściciela zasobu (`user_id` / `employee_id`) przed każdą operacją edycji, podglądu lub anulowania.
 
-## Dostęp do aplikacji
+### 2. Panel Administratora (Etap 3)
+- **Dashboard (`admin_panel.php`):** Statystyki na żywo z bazy danych – liczba klientów, pracowników, usług, wszystkich rezerwacji, wizyt na dziś oraz łączny przychód.
+- **Kategorie usług (`admin_categories.php`):** Pełny CRUD kategorii z blokadą usunięcia kategorii posiadającej przypisane usługi.
+- **Usługi i zabiegi (`admin_services.php`):** Zarządzanie cennikiem, czasem trwania, przypisaniem do kategorii, aktywacją/dezaktywacją oraz blokadą usunięcia usługi posiadającej historię rezerwacji.
+- **Pracownicy i grafik (`admin_employees.php`):** Tworzenie profili fizjoterapeutów, przypisywanie wykonywanych zabiegów (relacja `N:M`) oraz definiowanie godzin pracy.
+- **Użytkownicy (`admin_users.php`):** Lista kont z wyszukiwarką po imieniu, nazwisku i e-mailu, zmianą roli oraz blokowaniem/odblokowywaniem dostępu.
+- **Rezerwacje (`admin_reservations.php`):** Przegląd wszystkich wizyt, filtrowanie wielokryterialne (data, status, pracownik), zmiana statusów oraz eksport do pliku CSV.
 
-### 1. Wersja online (Zalecana do szybkiego testowania)
-Aplikacja została wdrożona na serwerze zewnętrznym i jest dostępna pod adresem: **[https://fizjo.dziadu.dev/](https://fizjo.dziadu.dev/)**
+### 3. Część Klienta, System Rezerwacji i Panel Pracownika (Etap 4)
+- **Publiczna oferta usług (`index.php`):** Katalog aktywnych zabiegów z filtrowaniem po kategoriach, wyszukiwarką tekstową, czasem trwania, ceną oraz listą przypisanych specjalistów.
+- **5-etapowy proces rezerwacji (`client_panel.php`):** Obowiązkowy przepływ:
+  `1. Usługa -> 2. Fizjoterapeuta -> 3. Data wizyty -> 4. Dostępna godzina -> 5. Potwierdzenie`
+- **Algorytm dostępności i wykrywania konfliktów przedziałów:**
+  - System wyznacza możliwe sloty czasowe wyłącznie w granicach godzin dyżuru wybranego pracownika i z uwzględnieniem czasu trwania zabiegu (`duration`).
+  - Blokowane są terminy w przeszłości, poza godzinami pracy oraz wszystkie częściowo lub całkowicie nakładające się rezerwacje wg reguły:
+    `start_nowej < koniec_istniejącej AND koniec_nowej > start_istniejącej`
+  - Bezpośrednio przed zapisem (`INSERT`) serwer ponownie weryfikuje brak kolizji wewnątrz transakcji SQL z blokadą `SELECT ... FOR UPDATE`, co zabezpiecza przed ominięciem walidacji w przeglądarce oraz równoczesnym zajęciem tego samego terminu.
+- **Panel Pacjenta (`client_panel.php`):** Podgląd własnych rezerwacji z podziałem na nadchodzące oraz historię/anulowane, anulowanie własnych przyszłych wizyt, zmiana terminu (przełożenie wizyty) oraz edycja danych profilu i hasła.
+- **Panel Fizjoterapeuty (`employee_panel.php`):** Podział własnych wizyt na dzisiejsze, przyszłe oraz historię, karta szczegółów rezerwacji z danymi kontaktowymi pacjenta i uwagami, zmiana statusu wizyty (`oczekująca`, `potwierdzona`, `zrealizowana`, `anulowana`) oraz zarządzanie własnym grafikiem dyżurów.
 
-### 2. Instrukcja uruchomienia lokalnego
-1. Upewnij się, że posiadasz zainstalowane środowisko serwera lokalnego obsługujące PHP i MySQL (np. XAMPP).
-2. Sklonuj niniejsze repozytorium do głównego katalogu serwera (np. `C:\xampp\htdocs\Projekt-aplikacje`).
-3. Uruchom moduły **Apache** oraz **MySQL** w panelu kontrolnym XAMPP.
-4. Przejdź do narzędzia phpMyAdmin (`http://localhost/phpmyadmin`) i utwórz nową, pustą bazę danych (np. `fizjoterapia`).
-5. Zaimportuj do nowo utworzonej bazy plik `database.sql` (znajdujący się w folderze `/database/` lub głównym katalogu repozytorium).
-6. Przejdź do folderu `includes/`, skopiuj plik `config.example.php` i zmień nazwę kopii na `config.php`.
-7. Otwórz plik `includes/config.php` i wpisz w nim nazwę swojej bazy danych (w zmiennej `$db`).
-8. Uruchom projekt wpisując w pasku adresu przeglądarki: `http://localhost/Projekt-aplikacje/public/index.php`.
+---
+
+## Funkcje dodatkowe
+1. **Graficzny kalendarz dyżurów:** Interaktywny kalendarz miesięczny w kreatorze rezerwacji podświetlający dni i godziny pracy wybranego fizjoterapeuty oraz blokujący dni wolne i minione.
+2. **Dynamiczne pobieranie danych (AJAX / Fetch API):** Asynchroniczne ładowanie specjalistów przypisanych do usługi oraz wolnych i kolidujących slotów godzinowych bez przeładowywania strony.
+3. **Przełożenie terminu wizyty przez pacjenta:** Możliwość zmiany daty i godziny nadchodzącej rezerwacji z pełną walidacją godzin pracy i kolizji przedziałów.
+4. **Eksport rezerwacji do CSV oraz statystyki finansowe:** Pobieranie raportów rezerwacji z uwzględnieniem aktywnych filtrów oraz podsumowanie przychodów na dashboardzie administratora.
+5. **Wyszukiwarka i filtrowanie oferty oraz użytkowników:** Filtrowanie zabiegów po kategoriach i frazie na stronie głównej oraz wyszukiwanie kont w panelu administratora.
+
+---
+
+## Struktura repozytorium
+```text
+├── css/
+│   └── style.css
+├── database/
+│   ├── database.sql
+│   └── diagram.md
+├── images/
+│   └── diagram.png
+├── includes/
+│   ├── admin_auth.php
+│   ├── admin_header.php
+│   └── config.example.php
+├── js/
+│   └── script.js
+├── public/
+│   ├── index.php
+│   ├── login.php
+│   ├── register.php
+│   ├── logout.php
+│   ├── client_panel.php
+│   ├── employee_panel.php
+│   ├── admin_panel.php
+│   ├── admin_categories.php
+│   ├── admin_services.php
+│   ├── admin_employees.php
+│   ├── admin_users.php
+│   └── admin_reservations.php
+└── README.md
+```
+
+---
+
+## Instrukcja uruchomienia
+
+### 1. Wersja online
+Aplikacja jest wdrożona i dostępna pod adresem: **[https://fizjo.dziadu.dev/](https://fizjo.dziadu.dev/)**
+
+### 2. Uruchomienie lokalne (XAMPP)
+1. Sklonuj repozytorium do katalogu `htdocs` w XAMPP (np. `C:\xampp\htdocs\Projekt-aplikacje`).
+2. Uruchom moduły **Apache** oraz **MySQL** w panelu XAMPP Control Panel.
+3. Otwórz **phpMyAdmin** (`http://localhost/phpmyadmin`) i utwórz nową bazę danych o nazwie `fizjoterapia` (kodowanie `utf8mb4_unicode_ci`).
+4. Zaimportuj do utworzonej bazy plik `database/database.sql`.
+5. W katalogu `includes/` skopiuj plik `config.example.php` jako `config.php` i upewnij się, że parametry połączenia odpowiadają Twojej konfiguracji lokalnej (`$db = 'fizjoterapia'`).
+6. Otwórz aplikację w przeglądarce pod adresem: `http://localhost/Projekt-aplikacje/public/index.php`.
+
+---
 
 ## Testowe dane logowania
-W bazie danych przygotowano konta testowe z przypisanymi odpowiednimi rolami:
 
 | Rola w systemie | Adres e-mail | Hasło | Docelowy panel |
 | :--- | :--- | :--- | :--- |
 | **Administrator** | `admin@gabinet.pl` | `password` | `admin_panel.php` |
 | **Pracownik (Fizjoterapeuta)** | `anna@gabinet.pl` | `password` | `employee_panel.php` |
 | **Klient (Pacjent)** | `pacjent@test.pl` | `password` | `client_panel.php` |
-
-## Funkcje dodatkowe
-W projekcie zaimplementowano i zintegrowano następujące funkcje dodatkowe:
-- **Dynamiczne pobieranie terminów (AJAX / Fetch API):** Interaktywny wybór usługi, fizjoterapeuty, dni dyżurów oraz wolnych i zajętych przedziałów godzinowych bez przeładowywania strony.
-- **Przełożenie terminu wizyty przez klienta:** Możliwość zmiany daty i godziny własnej przyszłej rezerwacji z pełną walidacją godzin pracy i konfliktów przedziałów czasowych.
-- **Zarządzanie własnym grafikiem przez pracownika:** Fizjoterapeuta może samodzielnie dodawać i aktualizować godziny swoich dyżurów w panelu pracownika.
-- **Wyszukiwarka i filtrowanie oferty oraz użytkowników:** Filtrowanie zabiegów po kategoriach i frazie na stronie głównej oraz wyszukiwarka użytkowników i wielokryterialne filtrowanie rezerwacji w panelu administratora.
